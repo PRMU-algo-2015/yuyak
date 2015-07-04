@@ -20,7 +20,7 @@ shift_voting.hppの結果
     - Lv2, recall: 1.37826,  precision: 2.33523
     - Lv1, recall: 2.96895,  precision: 3.5023
 
-Lableのみ
+Labelのみ
     - Lv3, recall: 27.3859,  precision: 30.3922
     - Lv2, recall: 39.8734,  precision: 46.1111
     - Lv1, recall: 63.9594,  precision: 66.4671
