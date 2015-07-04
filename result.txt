@@ -1,15 +1,27 @@
 random_labeling.hppの結果
 
 6sec
-Labelのみ：
-	- Lv3, recall: 11.2033,  precision: 10.7843
-	- Lv2, recall: 12.6582,  precision: 13.3333
-	- Lv1, recall: 12.1827,  precision: 13.7725
-
 スコア
 	- Lv3, recall: 0.117892,  precision: 0.181743
 	- Lv2, recall: 0.672932,  precision: 1.0733
 	- Lv1, recall: 1.27139,  precision: 1.49979
 
+Labelのみ：
+	- Lv3, recall: 11.2033,  precision: 10.7843
+	- Lv2, recall: 12.6582,  precision: 13.3333
+	- Lv1, recall: 12.1827,  precision: 13.7725
 
+
+shift_voting.hppの結果
+
+456sec
+スコア
+    - Lv3, recall: 0.414336,  precision: 0.860287
+    - Lv2, recall: 1.37826,  precision: 2.33523
+    - Lv1, recall: 2.96895,  precision: 3.5023
+
+Lableのみ
+    - Lv3, recall: 27.3859,  precision: 30.3922
+    - Lv2, recall: 39.8734,  precision: 46.1111
+    - Lv1, recall: 63.9594,  precision: 66.4671
 
