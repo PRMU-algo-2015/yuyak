@@ -14,7 +14,7 @@
 using namespace std;
 using namespace cv;
 
-void shift_voting(
+void BoF_SIFT(
 	//
 	// output
 	prmu::ImageList (&imlist_result)[3], // 結果情報の記録用
