@@ -25,3 +25,16 @@ Labelのみ
     - Lv2, recall: 39.8734,  precision: 46.1111
     - Lv1, recall: 63.9594,  precision: 66.4671
 
+BoF_SIFT_norm.hppの結果
+
+438sec
+スコア
+    - Lv3, recall: 0.522598,  precision: 1.06895
+    - Lv2, recall: 1.76171,  precision: 2.96052
+    - Lv1, recall: 3.16123,  precision: 3.72912
+
+Labelのみ
+    - Lv3, recall: 42.3237,  precision: 38.2353
+    - Lv2, recall: 53.7975,  precision: 56.6667
+    - Lv1, recall: 62.4365,  precision: 67.0659
+
