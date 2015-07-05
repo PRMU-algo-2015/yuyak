@@ -7,7 +7,7 @@ PRMUアルゴリズムコンテスト2015に挑戦してみた
 現在の方針:
     SIFT特徴量を用いてBoF(Bag of features)を作成する. 二乗距離最小のものに投票を行う.
 
-コード:
+コード:  
     random_labeling.hpp : ラベルをランダムに割り振る  
     BoF_SIFT.hpp : BoF + SIFT  
     BoF_SIFT_norm.hpp : BoF + normalization SIFT  
