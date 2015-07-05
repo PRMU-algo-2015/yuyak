@@ -4,7 +4,7 @@ PRMUアルゴリズムコンテスト2015に挑戦してみた
 
 靴の画像群からメーカーのロゴを抽出する課題
 
-現在の方針:
+現在の方針:  
     SIFT特徴量を用いてBoF(Bag of features)を作成する. 二乗距離最小のものに投票を行う.
 
 コード:  
@@ -12,6 +12,6 @@ PRMUアルゴリズムコンテスト2015に挑戦してみた
     BoF_SIFT.hpp : BoF + SIFT  
     BoF_SIFT_norm.hpp : BoF + normalization SIFT  
 
-結果:
+結果:  
     result.txt
     
