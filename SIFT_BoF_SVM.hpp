@@ -31,8 +31,9 @@ void SIFT_BoF_SVM(
 
     //set <int> bad={7,17,18,23,25,26,28,30,33,34,36,50,51,52,56,57,58,60,61,62,65,66,71,72,73,77,79,83,84,85,87,96,100,108,109,112,113,119,121,123,124,125,128,129,130,131,134,135,136,139,141,147,149,150,154,155,157,158,162,167,171,173,177,179};
 
-    cv::SiftFeatureDetector detector;
-    cv::SiftDescriptorExtractor extractor;
+    Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
+    Ptr<FeatureDetector> detector(new SiftFeatureDetector());
+    Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
 
     cv::Mat descriptors;
     vector <int> partition;
@@ -41,25 +42,26 @@ void SIFT_BoF_SVM(
 
     //gather SIFT features
 
-    for(ite_learn=imlist_learn.begin();ite_learn!=imlist_learn.end();ite_learn++){
-        Mat learn=imread(ite_learn->full_file_path(),0);
+    for (ite_learn = imlist_learn.begin(); ite_learn != imlist_learn.end(); ite_learn++) {
+        Mat learn = imread(ite_learn->full_file_path(), 0);
 
         vector <cv::KeyPoint> keypoints;
         Mat descriptor;
-        detector.detect(learn, keypoints );
-        extractor.compute(learn, keypoints, descriptor);
+
+        detector->detect(learn, keypoints );
+        extractor->compute(learn, keypoints, descriptor);
 
         descriptors.push_back(descriptor);
 
-        partition.push_back(partition.back()+descriptor.rows);
+        partition.push_back(partition.back() + descriptor.rows);
     }
 
     //make bag of features ::: kmeans clustering and convert to histgram
 
-    const int cluster_num=25;
-    BOWKMeansTrainer bofTrainer(cluster_num,cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6), 1,KMEANS_PP_CENTERS);
+    const int cluster_num = 25;
+    BOWKMeansTrainer bofTrainer(cluster_num, cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6), 1, KMEANS_PP_CENTERS);
 
-    Mat dictionary=bofTrainer.cluster(descriptors);
+    Mat dictionary = bofTrainer.cluster(descriptors);
 
     //preserve
     /*FileStorage fs("dictionary.yml", FileStorage::WRITE);
@@ -68,41 +70,37 @@ void SIFT_BoF_SVM(
 
 
     //svm training
-    Ptr<DescriptorMatcher> sift_matcher(new FlannBasedMatcher);
-    Ptr<FeatureDetector> sift_detector(new SiftFeatureDetector());
-    Ptr<DescriptorExtractor> sift_extractor(new SiftDescriptorExtractor);
-
-    BOWImgDescriptorExtractor bowDE(sift_extractor,sift_matcher);
+    BOWImgDescriptorExtractor bowDE(extractor, matcher);
     bowDE.setVocabulary(dictionary);
 
     Mat histgram;
     Mat learn_label;
 
-    for(ite_learn=imlist_learn.begin();ite_learn!=imlist_learn.end();ite_learn++){
-        Mat learn_img=imread(ite_learn->full_file_path(),0);
+    for (ite_learn = imlist_learn.begin(); ite_learn != imlist_learn.end(); ite_learn++) {
+        Mat learn_img = imread(ite_learn->full_file_path(), 0);
 
         vector<KeyPoint> sift_keypoints;
-        sift_detector->detect(learn_img,sift_keypoints);
+        detector->detect(learn_img, sift_keypoints);
 
         Mat bowDescriptor;
-        bowDE.compute(learn_img,sift_keypoints,bowDescriptor);
+        bowDE.compute(learn_img, sift_keypoints, bowDescriptor);
 
         histgram.push_back(bowDescriptor);
-        learn_label.push_back((int)ite_learn->label_of_1st_img()/10);
+        learn_label.push_back((int)ite_learn->label_of_1st_img() / 10);
     }
 
     CvSVMParams params;
     params.svm_type    = CvSVM::C_SVC;
     params.kernel_type = CvSVM::RBF;
     params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 500, 0.0001);
-    params.C=300;
-    params.gamma=0.5;
+    params.C = 300;
+    params.gamma = 0.5;
 
     CvSVM svm;
 
-    if(svm.train(histgram, learn_label, Mat(), Mat(), params)){
-        cerr<<"successfully train!"<<endl;
-    }else{
+    if (svm.train_auto(histgram, learn_label, Mat(), Mat(), params)) {
+        cerr << "successfully train!" << endl;
+    } else {
         assert(-1);
     }
 
@@ -113,7 +111,7 @@ void SIFT_BoF_SVM(
     dump(now.gamma);
     dump(now.p);*/
 
-    map <prmu::Label,pair<int,int> > answer_rate;
+    map <prmu::Label, pair<int, int> > answer_rate;
 
     for ( size_t _lv = 0; _lv < lv; ++_lv )
     {
@@ -126,41 +124,42 @@ void SIFT_BoF_SVM(
         // The access to the annotation information (i.e., member variables and functions)
         // is performed by (*ite_test).XXX or ite_test->XXX
 
-        for(ite_test=imlist_test[_lv].begin();ite_test!=imlist_test[_lv].end();++ite_test,++ite_result){
-            Mat test_img=imread(ite_test->full_file_path(),0);
-            size_t sy=test_img.rows, sx=test_img.cols; // size of image
+        for (ite_test = imlist_test[_lv].begin(); ite_test != imlist_test[_lv].end(); ++ite_test, ++ite_result) {
+            Mat test_img = imread(ite_test->full_file_path(), 0);
+            size_t sy = test_img.rows, sx = test_img.cols; // size of image
 
             vector<KeyPoint> sift_keypoints;
-            sift_detector->detect(test_img,sift_keypoints);
+            detector->detect(test_img, sift_keypoints);
 
             Mat test_bowDescriptor;
-            bowDE.compute(test_img,sift_keypoints,test_bowDescriptor);
+            bowDE.compute(test_img, sift_keypoints, test_bowDescriptor);
 
             cv::Mat result;
 
-            svm.predict(test_bowDescriptor,result);
+            svm.predict(test_bowDescriptor, result);
 
-            int label=result.at<float>(0,0);
+            int label = result.at<float>(0, 0);
 
-            cerr<<"true label="<<ite_test->label_of_1st_img()<<", detection label="<<label*10<<endl;
-            answer_rate[ite_test->label_of_1st_img()].first+=prmu::label::issame(ite_test->label_of_1st_img(), (prmu::Label)(label*10));
+            cerr << "true label=" << ite_test->label_of_1st_img() << ", detection label=" << label * 10 << endl;
+            answer_rate[ite_test->label_of_1st_img()].first += prmu::label::issame(ite_test->label_of_1st_img(), (prmu::Label)(label * 10));
             answer_rate[ite_test->label_of_1st_img()].second++;
 
             prmu::Rect bbox;
 
-            bbox.x = sx/2;
-            bbox.y = sy/2;
-            bbox.w = sx/2;
-            bbox.h = sy/2;
+            bbox.x = sx / 2;
+            bbox.y = sy / 2;
+            bbox.w = sx / 2;
+            bbox.h = sy / 2;
             // このデモでは，前処理において読み込んだ画像を 1/2 倍のサイズへと縮小したため，
             // もとのサイズの座標と対応させるため 2 倍している
 
-            bbox = bbox.overlap( prmu::Rect(0,0,sx,sy) ); // 外接矩形が画像端をはみ出さないように補正（重要，スコアに影響する）
+            bbox = bbox.overlap( prmu::Rect(0, 0, sx, sy) ); // 外接矩形が画像端をはみ出さないように補正（重要，スコアに影響する）
 
-            ite_result->append_result( (prmu::Label)(label*10), bbox );
+            ite_result->append_result( (prmu::Label)(label * 10), bbox );
         }
-        for(auto it:answer_rate){
-            cerr<<"PRMU::Label:"<<it.first<<",　answer rate:"<<1.0*it.second.first/it.second.second<<endl;
+        for (auto it : answer_rate) {
+            cerr << "PRMU::Label:" << it.first << ",　answer rate:" << 1.0 * it.second.first / it.second.second << endl;
         }
     } // end of the for-loop for level
 }
+
