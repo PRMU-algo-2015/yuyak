@@ -101,7 +101,7 @@ void SIFT_BoF_SVM(
     if (svm.train_auto(histgram, learn_label, Mat(), Mat(), params)) {
         cerr << "successfully train!" << endl;
     } else {
-        assert(-1);
+        assert(0);
     }
 
     /*CvSVMParams now=svm.get_params();

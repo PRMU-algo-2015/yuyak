@@ -11,7 +11,7 @@ PRMUアルゴリズムコンテスト2015に挑戦してみた
     random_labeling.hpp : ラベルをランダムに割り振る   
     voting_SIFT.hpp : SIFT  
     voting_SIFT_norm.hpp : normalization SIFT  
-    SIFT_BoF_SVM.hpp : SIFT+BoW+SVM  
+    SIFT_BoF_SVM.hpp : SIFT+BoF+SVM  
 
 結果:
     result.txt
