@@ -9,8 +9,8 @@ PRMUアルゴリズムコンテスト2015に挑戦してみた
 
 コード:  
     random_labeling.hpp : ラベルをランダムに割り振る  
-    voting_SIFT.hpp : BoF + SIFT  
-    voting_SIFT_norm.hpp : BoF + normalization SIFT  
+    voting_SIFT.hpp : SIFT  
+    voting_SIFT_norm.hpp : normalization SIFT  
 
 結果:  
     result.txt
