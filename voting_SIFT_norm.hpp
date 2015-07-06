@@ -5,6 +5,7 @@
 #include <set>
 #include <random>
 #include <algorithm>
+#include <numeric>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -14,7 +15,7 @@
 using namespace std;
 using namespace cv;
 
-void BoF_SIFT(
+void voting_SIFT_norm(
 	//
 	// output
 	prmu::ImageList (&imlist_result)[3], // 結果情報の記録用
@@ -68,6 +69,13 @@ void BoF_SIFT(
             for(int j=0;j<descriptor.cols;j++){
                 tmp.emplace_back(descriptor.at<float>(i,j));
             }
+            
+            float norm=sqrt(inner_product(tmp.begin(),tmp.end(),tmp.begin(),0.0));
+                        
+            for(int j=0;j<tmp.size();j++){
+                    tmp[j]/=norm;
+            }
+
             features.emplace_back(tmp);
         }
 
@@ -124,6 +132,12 @@ void BoF_SIFT(
                 vector <float> query(128);
                 for(int j=0;j<128;j++){
                     query[j]=descriptor.at<float>(i,j);
+                }
+                
+                float norm=sqrt(inner_product(query.begin(), query.end(), query.begin(),0.0));
+                                                
+                for(int j=0;j<128;j++){
+                    query[j]/=norm;
                 }
 
                 kd.knnSearch(query, indices, dist, k, flann::SearchParams(100));
